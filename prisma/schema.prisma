@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  admin
+  employee
+}
+
+enum ShipmentStatus {
+  created
+  booked
+  in_transit
+  delivered
+  cancelled
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         Role
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Shipment {
+  id               String         @id @default(cuid())
+  referenceNumber  String         @unique
+  shipperName      String
+  carrierName      String
+  pickupLocation   String
+  deliveryLocation String
+  pickupDate       DateTime
+  deliveryDate     DateTime?
+  status           ShipmentStatus @default(created)
+
+  rateCents        Int
+  currency         String         @default("USD")
+
+  flagged          Boolean        @default(false)
+
+  trackingEvents   TrackingEvent[]
+
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([status])
+  @@index([shipperName])
+  @@index([carrierName])
+  @@index([pickupDate])
+  @@index([updatedAt])
+}
+
+model TrackingEvent {
+  id          String   @id @default(cuid())
+  shipmentId  String
+  status      ShipmentStatus
+  message     String
+  location    String
+  occurredAt  DateTime
+
+  shipment    Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  @@index([shipmentId, occurredAt])
+}

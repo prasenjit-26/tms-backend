@@ -1,0 +1,123 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AuthPayload {
+  accessToken: String!
+  user: AuthUser!
+}
+
+type AuthUser {
+  email: String!
+  id: String!
+  role: Role!
+}
+
+input CreateShipmentInput {
+  carrierName: String!
+  currency: String
+  deliveryLocation: String!
+  pickupDate: DateTime!
+  pickupLocation: String!
+  rateCents: Int!
+  referenceNumber: String!
+  shipperName: String!
+  status: ShipmentStatus!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Mutation {
+  addShipment(input: CreateShipmentInput!): Shipment!
+  deleteShipment(id: ID!): Boolean!
+  flagShipment(flagged: Boolean!, id: ID!): Shipment!
+  login(input: LoginInput!): AuthPayload!
+  updateShipment(id: ID!, input: UpdateShipmentInput!): Shipment!
+}
+
+input PaginationInput {
+  page: Int!
+  pageSize: Int!
+}
+
+type Query {
+  shipment(id: ID!): Shipment!
+  shipments(filter: ShipmentFilterInput, pagination: PaginationInput!, sort: ShipmentSortInput): ShipmentConnection!
+}
+
+enum Role {
+  admin
+  employee
+}
+
+type Shipment {
+  carrierName: String!
+  createdAt: DateTime!
+  currency: String!
+  deliveryDate: DateTime
+  deliveryLocation: String!
+  flagged: Boolean!
+  id: ID!
+  pickupDate: DateTime!
+  pickupLocation: String!
+  rateCents: Int!
+  referenceNumber: String!
+  shipperName: String!
+  status: ShipmentStatus!
+  trackingEvents: [TrackingEvent!]!
+  updatedAt: DateTime!
+}
+
+type ShipmentConnection {
+  hasNextPage: Boolean!
+  nodes: [Shipment!]!
+  page: Int!
+  pageSize: Int!
+  totalCount: Int!
+}
+
+input ShipmentFilterInput {
+  flagged: Boolean
+  q: String
+  status: ShipmentStatus
+}
+
+input ShipmentSortInput {
+  direction: String!
+  field: String!
+}
+
+enum ShipmentStatus {
+  booked
+  cancelled
+  created
+  delivered
+  in_transit
+}
+
+type TrackingEvent {
+  id: ID!
+  location: String!
+  message: String!
+  occurredAt: DateTime!
+  status: ShipmentStatus!
+}
+
+input UpdateShipmentInput {
+  carrierName: String
+  currency: String
+  deliveryLocation: String
+  flagged: Boolean
+  pickupLocation: String
+  rateCents: Int
+  shipperName: String
+  status: ShipmentStatus
+}
